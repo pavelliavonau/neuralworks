@@ -14,6 +14,7 @@ NeuroApp::NeuroApp() :
 //    mMainWindow = new MainWindow(this);
     mMainWindow.show();
 
+//    mNeuroNet = new NeuroNet(12, 6, 0.007);
 }
 
 NeuroApp::~NeuroApp()
