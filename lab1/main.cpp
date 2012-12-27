@@ -1,11 +1,8 @@
 #include <QApplication>
-#include "Main_Window.h"
+#include "neuroapp.h"
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
-    
+    NeuroApp a( argc, argv );
     return a.exec();
 }

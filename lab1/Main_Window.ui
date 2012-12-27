@@ -1,7 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow" >
-  <property name="geometry" >
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,16 +10,64 @@
     <height>300</height>
    </rect>
   </property>
-  <property name="windowTitle" >
-   <string>MainWindow</string>
+  <property name="windowTitle">
+   <string>Neural work</string>
   </property>
-  <widget class="QMenuBar" name="menuBar" />
-  <widget class="QToolBar" name="mainToolBar" />
-  <widget class="QWidget" name="centralWidget" />
-  <widget class="QStatusBar" name="statusBar" />
+  <widget class="QWidget" name="centralWidget"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>400</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuMain">
+    <property name="title">
+     <string>Main</string>
+    </property>
+    <addaction name="actionQuit"/>
+   </widget>
+   <addaction name="menuMain"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionLoad_image"/>
+   <addaction name="actionTeach_net"/>
+   <addaction name="actionDraw_result"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionLoad_image">
+   <property name="text">
+    <string>load image</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="actionTeach_net">
+   <property name="text">
+    <string>teach net</string>
+   </property>
+  </action>
+  <action name="actionDraw_result">
+   <property name="text">
+    <string>draw result</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+  </action>
  </widget>
- <layoutDefault spacing="6" margin="11" />
- <pixmapfunction></pixmapfunction>
+ <layoutdefault spacing="6" margin="11"/>
  <resources/>
  <connections/>
 </ui>

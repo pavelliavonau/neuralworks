@@ -13,5 +13,5 @@
 *.a
 
 # QtCreator spec files
-*.user
 /lab1-build-desktop*
+lab1/lab1.pro.user

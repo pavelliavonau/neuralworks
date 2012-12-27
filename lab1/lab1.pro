@@ -15,9 +15,15 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         Main_Window.cpp \
-    logic/matrix.cpp
+    logic/matrix.cpp \
+    neuroapp.cpp \
+    logic/Image_proc.cpp \
+    logic/Neuro_net.cpp
 
 HEADERS  += Main_Window.h \
-    logic/matrix.h
+    logic/matrix.h \
+    neuroapp.h \
+    logic/Image_proc.h \
+    logic/Neuro_net.h
 
 FORMS    += Main_Window.ui
