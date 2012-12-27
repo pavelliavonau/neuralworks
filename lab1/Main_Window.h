@@ -7,14 +7,19 @@ namespace Ui {
 class MainWindow;
 }
 
+class NeuroApp;
+class QPixmap;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
     
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(NeuroApp *app);
     ~MainWindow();
     
+    QPixmap* loadPixmap();
+
 private slots:
     void on_actionQuit_triggered();
 
@@ -26,6 +31,9 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    QPixmap         mLoadedPicture;
+    NeuroApp        *mNeuroApp;
+
 };
 
 #endif // MAIN_WINDOW_H

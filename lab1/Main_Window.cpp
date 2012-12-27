@@ -1,16 +1,32 @@
 #include "Main_Window.h"
 #include "ui_Main_Window.h"
+#include <QFileDialog>
+#include "logic/Neuro_net.h"
+#include "neuroapp.h"
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
+MainWindow::MainWindow(NeuroApp *app):
     ui(new Ui::MainWindow)
+  , mNeuroApp(app)
 {
-    ui->setupUi(this);
+    ui->setupUi(this);    
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+QPixmap *MainWindow::loadPixmap()
+{
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    tr("Open File"),
+                                                    QString(),
+                                                    tr("Images (*.png *.xpm *.jpg *.bmp)")
+                                                   );
+    mLoadedPicture.load(fileName);
+    ui->LoadedImage->setPixmap(mLoadedPicture);
+
+    return &mLoadedPicture;
 }
 
 void MainWindow::on_actionQuit_triggered()
@@ -20,7 +36,7 @@ void MainWindow::on_actionQuit_triggered()
 
 void MainWindow::on_actionLoad_image_triggered()
 {
-
+    mNeuroApp->LoadImage();
 }
 
 void MainWindow::on_actionTeach_net_triggered()

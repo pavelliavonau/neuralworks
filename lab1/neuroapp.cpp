@@ -1,21 +1,30 @@
 #include "neuroapp.h"
-#include "Main_Window.h"
-#include "logic/Neuro_net.h"
-#include "logic/Image_proc.h"
+#include <QPixmap>
 
-NeuroApp::NeuroApp(int argc, char *argv[]) :
-    QApplication(argc, argv)
+volatile const int NeuroApp::N = 5;
+volatile const int NeuroApp::M = 7;
+volatile const int NeuroApp::P = 30;
+
+
+NeuroApp::NeuroApp() :
+    mMainWindow( this )
+  //, mNeuroNet( this )
+  //, mImageProc( )
 {
-    mMainWindow = new MainWindow();
-    mMainWindow->show();
+//    mMainWindow = new MainWindow(this);
+    mMainWindow.show();
 
-    mNeuroNet = new NeuroNet();
-    mImageProc = new ImageProc();
 }
 
 NeuroApp::~NeuroApp()
 {
-    delete mMainWindow;
-    delete mNeuroNet;
-    delete mImageProc;
+
+}
+
+void NeuroApp::LoadImage()
+{
+    QPixmap* pix = mMainWindow.loadPixmap();
+
+    Matrix matrix = mImageProc.GetTeachingMatrixFromPicture(*pix, N, M);
+
 }
