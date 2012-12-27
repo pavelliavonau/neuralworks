@@ -1,4 +1,6 @@
 #include "matrix.h"
+#include "stdlib.h"
+#include "QTime"
 
 Matrix::Matrix(const int row,const int col) :
     matr(QVector<QVector<qreal>*>(row,0))
@@ -83,6 +85,26 @@ Matrix  Matrix::operator*(const Matrix& other) const
     return *this;
 }
 
+Matrix Matrix::operator-(const Matrix &other) const
+{
+    if( other.getCol() != col || other.getRow() != row )
+    {
+        return *this;
+    }
+
+    Matrix newMatrix(row, col);
+
+    for( int i = 0; i < row; i++ )
+    {
+        for( int j = 0; j < col; j++ )
+        {
+            newMatrix.set(i, j, get(i, j) - other.get(i, j));
+        }
+    }
+
+    return newMatrix;
+}
+
 qreal& Matrix::operator[](QPair<int,int> p) const
 {
     QVector<qreal> *v = matr.operator [](p.first);
@@ -145,3 +167,70 @@ QString Matrix::toString() const
     matrixString.append("}");
     return matrixString;
 }
+
+void Matrix::randomInitialize()
+{
+    qsrand(QTime::currentTime().msec());
+
+    for( int i = 0; i < row; i++ )
+    {
+        for( int j = 0; j < col; j++ )
+        {
+            long int rand_value = rand() % 2001;
+            set(i,j, qreal(rand_value / 1000. - 1));
+        }
+    }
+}
+
+Matrix Matrix::transpose()
+{
+    Matrix newMatrix(col, row);
+
+    for( int i = 0; i < row; i++ )
+    {
+        for( int j = 0; j < col; j++ )
+        {
+            newMatrix.set(j, i, matr[i]->at(j));
+        }
+    }
+
+    return newMatrix;
+}
+
+Matrix Matrix::getVector(int num)
+{
+    Matrix vector(1, col);
+
+    for( int j = 0; j < col; j++ )
+    {
+        vector.set(1, j, matr[num]->at(j));
+    }
+
+    return vector;
+}
+
+void Matrix::normalize()
+{
+    for( int j = 0; j < col; j++ )
+    {
+        qreal avg = getAvgForVector(j);
+
+        for( int i = 0; i < row; j++ )
+        {
+            set(i, j, matr[i]->at(j)/avg);
+        }
+    }
+}
+
+qreal Matrix::getAvgForVector(int num)
+{
+    qreal sum = 0;
+
+    for( int i = 0; i < row; i++ )
+    {
+        sum += matr[i]->at(num);
+    }
+
+    return sum/row;
+}
+
