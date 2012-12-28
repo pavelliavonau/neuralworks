@@ -29,6 +29,12 @@ QPixmap *MainWindow::loadPixmap()
     return &mLoadedPicture;
 }
 
+void MainWindow::ShowResult(QImage image)
+{
+
+    ui->LoadedImage->setPixmap(QPixmap::fromImage(image));
+}
+
 void MainWindow::on_actionQuit_triggered()
 {
     close();
@@ -41,10 +47,10 @@ void MainWindow::on_actionLoad_image_triggered()
 
 void MainWindow::on_actionTeach_net_triggered()
 {
-
+    mNeuroApp->TeachNeuroNet();
 }
 
 void MainWindow::on_actionDraw_result_triggered()
 {
-
+    mNeuroApp->ShowResult();
 }

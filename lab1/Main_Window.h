@@ -19,6 +19,7 @@ public:
     ~MainWindow();
     
     QPixmap* loadPixmap();
+    void ShowResult(QImage);
 
 private slots:
     void on_actionQuit_triggered();

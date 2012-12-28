@@ -1,58 +1,64 @@
 #include "matrix.h"
 #include "stdlib.h"
-#include "QTime"
+#include <QTime>
 
 Matrix::Matrix(const int row,const int col) :
-    matr(QVector<QVector<qreal>*>(row,0))
+    matr(matrix_data_t(row))
 {
     this->row = row;
     this->col = col;
 
     for( int i = 0; i < row; i++ ){
-        matr[i] = new QVector<qreal>( col, 0 );
+        matr[i] = QVector<qreal>( col );
     }
 }
 
 Matrix::Matrix(const Matrix &copy) :
     row(copy.getRow()),
     col(copy.getCol()),
-    matr(QVector<QVector<qreal>*>(row,0))
+    matr(matrix_data_t(row))
 {
-    QVector<QVector<qreal>*> copyMatrix = copy.getMatrix();
+    matrix_data_t copyMatrix = copy.getMatrix();
 
     for( int i = 0; i < row; i++ ){
-        QVector<qreal>* temp =  new QVector<qreal>(*copyMatrix.at(i));
+        QVector<qreal> temp =  QVector<qreal>(copyMatrix.at(i));
         matr[i] = temp;
     }
 }
 
 Matrix::~Matrix()
 {
-    for( int i = 0; i < row; i++ ){
-        QVector<qreal>* pVector = matr[i];
-        delete pVector;
-    }
+//    for( int i = 0; i < row; i++ ){
+//        QVector<qreal> pVector = matr[i];
+//        delete pVector;
+//    }
 }
 
 Matrix& Matrix::operator=(const Matrix &other){
 
-    if(this != &other){
+    if( this != &other )
+    {
         col = other.getCol();
         row = other.getRow();
-        matr.resize(row);
-        QVector<qreal> *v;
-        for(int i = 0;i<col;i++){
-            v = matr.operator [](i);
-            v->resize(col);
+        // fit row size
+        matr.resize( row );
+
+        for( int rowi = 0; rowi < row; ++rowi )
+        {
+            QVector<qreal>& v = matr[ rowi ];
+            //if( col < v.size() )                    // FIXME! v may be undef
+//            {
+               v = QVector<qreal>( col );
+//            }
         }
         QPair<int,int> p;
-        for(int i = 0;i<row;i++){
-            for(int j = 0;j<col;j++)
+        for(int i = 0; i < row; i++){
+            for(int j = 0; j < col; j++)
             {
                 p.first = i;
                 p.second = j;
-                v = matr.operator [](i);
-                v->operator [](j) = other.operator [](p);
+                QVector<qreal>& v = matr[ i ];
+                v[j] = other[p];
             }
         }
     }
@@ -61,26 +67,33 @@ Matrix& Matrix::operator=(const Matrix &other){
 
 Matrix  Matrix::operator*(const Matrix& other) const
 {
-    if(col==other.getRow()){
-        Matrix mnew(row,other.getCol());
-        QPair<int,int> pnew,pthis,pother;
+    if( col == other.getRow() )
+    {
+        Matrix result_matrix( row, other.getCol() );
+
+        QPair< int, int > pnew,
+                          pthis,
+                          pother;
         qreal el = 0;
-        for( int i = 0; i<row; i++ ){
-            for( int j = 0; j < mnew.getCol(); j++ ){
+        for( int i = 0; i < row; ++i )
+        {
+            for( int j = 0; j < result_matrix.getCol(); ++j )
+            {
                 pthis.first = i;
                 pother.second = j;
-                for(int k = 0;k < col;k++){
+                for( int k = 0; k < col; ++k)
+                {
                     pthis.second = k;
                     pother.first = k;
-                    el+= this->operator [](pthis)*other.operator [](pother);
+                    el+= (*this)[pthis] * other[pother];
                 }
                 pnew.first = i;
                 pnew.second = j;
-                mnew.operator [](pnew) = el;
+                result_matrix[pnew] = el;
                 el = 0;
             }
         }
-        return mnew;
+        return result_matrix;
     }
     return *this;
 }
@@ -105,10 +118,16 @@ Matrix Matrix::operator-(const Matrix &other) const
     return newMatrix;
 }
 
-qreal& Matrix::operator[](QPair<int,int> p) const
+qreal& Matrix::operator[](QPair<int,int>& p)
 {
-    QVector<qreal> *v = matr.operator [](p.first);
-    return v->operator [](p.second);
+    QVector<qreal>& v = matr[p.first];
+    return v[p.second];
+}
+
+const qreal &Matrix::operator [](const QPair<int, int>& p) const
+{
+    const QVector<qreal>& v = matr[p.first];
+    return v[p.second];
 }
 
 int Matrix::getRow() const
@@ -128,7 +147,8 @@ void Matrix::set(const int row, const int col, const qreal val){
     this->operator [](p) = val;
 }
 
-Matrix  Matrix::operator*(const qreal val){
+Matrix  Matrix::operator*(const qreal val)
+{
     Matrix mnew(row,col);
     QPair<int,int> p;
     for(int i = 0;i<row;i++){
@@ -141,12 +161,13 @@ Matrix  Matrix::operator*(const qreal val){
     return mnew;
 }
 
-qreal Matrix::get(int row,int col) const{
-    QVector<qreal> *v = matr.operator [](row);
-    return v->operator [](col);
+qreal Matrix::get(int row,int col) const
+{
+    const QVector<qreal>& v = matr[row];
+    return v[col];
 }
 
-QVector<QVector<qreal> *> Matrix::getMatrix() const
+matrix_data_t Matrix::getMatrix() const
 {
     return matr;
 }
@@ -160,7 +181,7 @@ QString Matrix::toString() const
         matrixString.append("{ ");
         for( int j = 0; j < col; j++ )
         {
-            matrixString.append(((j!=0)?",":"") +  QString::number(matr[i]->at(j)));
+            matrixString.append(((j!=0)?",":"") +  QString::number(matr[i][j]));
         }
         matrixString.append("}\n");
     }
@@ -190,7 +211,7 @@ Matrix Matrix::transpose()
     {
         for( int j = 0; j < col; j++ )
         {
-            newMatrix.set(j, i, matr[i]->at(j));
+            newMatrix.set(j, i, matr[i][j]);
         }
     }
 
@@ -203,7 +224,7 @@ Matrix Matrix::getVector(int num)
 
     for( int j = 0; j < col; j++ )
     {
-        vector.set(1, j, matr[num]->at(j));
+        vector.set(0, j, matr[num][j]);
     }
 
     return vector;
@@ -215,9 +236,9 @@ void Matrix::normalize()
     {
         qreal avg = getAvgForVector(j);
 
-        for( int i = 0; i < row; j++ )
+        for( int i = 0; i < row; i++ )
         {
-            set(i, j, matr[i]->at(j)/avg);
+            set(i, j, matr[i][j]/avg);
         }
     }
 }
@@ -228,9 +249,56 @@ qreal Matrix::getAvgForVector(int num)
 
     for( int i = 0; i < row; i++ )
     {
-        sum += matr[i]->at(num);
+        sum += matr[i][num];
     }
 
     return sum/row;
+}
+
+std::ostream & operator <<(std::ostream &os, const Matrix& obj)
+{
+    os << obj.row << std::endl;
+    os << obj.col << std::endl;
+    for( int i = 0; i < obj.row; i++ )
+    {
+        for( int j = 0; j < obj.col; j++ )
+        {
+            os << obj.matr[i][j] << " ";
+        }
+    }
+    return os;
+}
+
+std::istream & operator >>(std::istream &is, Matrix& obj)
+{
+//    for( int i = 0; i < obj.getRow(); i++ ){
+//        QVector<qreal>* pVector = obj.matr[i];
+//        delete pVector;
+//    }
+
+    int row, col;
+
+    is >> row;
+    is >> col;
+
+    obj = Matrix( row, col );
+
+    for( int i = 0; i < obj.row; i++ ){
+        obj.matr[i] = QVector<qreal>( obj.col, 0 );
+    }
+
+    for( int i = 0; i < obj.row; i++ )
+    {
+        for( int j = 0; j < obj.col; j++ )
+        {
+            qreal v;
+            is >> v;
+            obj.matr[i].push_back(v);
+        }
+    }
+
+//    if( /* no valid object of T found in stream */ )
+//        is.setstate(std::ios::failbit);
+    return is;
 }
 

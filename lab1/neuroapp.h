@@ -21,13 +21,17 @@ public:
     static volatile const int N;
     static volatile const int M;
     static volatile const int P;
+    static volatile const double ALPHA;
 
     void LoadImage();    
+    void TeachNeuroNet();
+    void ShowResult();
 
 private:
     MainWindow      mMainWindow;
     NeuroNet        mNeuroNet;
     ImageProc       mImageProc;
+    Matrix          mMatrix;
 
 signals:
     
