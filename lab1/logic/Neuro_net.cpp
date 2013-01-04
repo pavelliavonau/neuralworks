@@ -12,12 +12,12 @@ NeuroNet::NeuroNet(int neuronsOnFirstLayer, int neuronsOnSecondLayer, double alp
     int cols = mFirstLayer.getCol();
     int rows = mFirstLayer.getRow();
 
-    mSecondLayer = Matrix(mFirstLayer.transpose());
+    mSecondLayer = my_matrix(mFirstLayer.transpose());
     cols = mSecondLayer.getCol();
     rows = mSecondLayer.getRow();
 }
 
-bool NeuroNet::train(Matrix &trainData, int maxIteration, int maxError)
+bool NeuroNet::train(my_matrix &trainData, int maxIteration, int maxError)
 {
     double error = maxError + 1, it = 0;
 
@@ -27,7 +27,7 @@ bool NeuroNet::train(Matrix &trainData, int maxIteration, int maxError)
 
         for( int i = 0; i < trainData.getRow(); i++ )
         {
-            Matrix inData = trainData.getVector(i),
+            my_matrix inData = trainData.getVector(i),
 
                    outData = inData * mFirstLayer,
                    restoredData = outData * mSecondLayer,
@@ -35,34 +35,30 @@ bool NeuroNet::train(Matrix &trainData, int maxIteration, int maxError)
 
             accomulateError(error, delta);
             trainLayers(delta, inData, outData);
-
         }
-        qDebug() << it;
+        qDebug() << "error = " << error;
         it++;
     }
 
     return true;
 }
 
-void NeuroNet::zipPicture(Matrix &matrix)
+void NeuroNet::zipPicture(my_matrix &matrix)
 {
-    Matrix temp = mFirstLayer * matrix;         //FIXME!!
+    my_matrix temp = matrix * mFirstLayer;
 
     std::ofstream file("temp.out");
 
     file << temp;
 
-    int cols = temp.getCol();
-    int rows = temp.getRow();
-
     file.close();
 
 }
 
-Matrix NeuroNet::unzipPicture()
+my_matrix NeuroNet::unzipPicture()
 {
     std::ifstream file("temp.out");
-    Matrix temp(0,0);
+    my_matrix temp(0,0);
     file >> temp;
 
     int cols = temp.getCol();
@@ -75,7 +71,7 @@ Matrix NeuroNet::unzipPicture()
     return temp * mSecondLayer;
 }
 
-void NeuroNet::accomulateError(double &error, Matrix &vector)
+void NeuroNet::accomulateError(double &error, my_matrix &vector)
 {
     for( int j = 0; j < vector.getCol(); j++ )
     {
@@ -83,19 +79,17 @@ void NeuroNet::accomulateError(double &error, Matrix &vector)
     }
 }
 
-void NeuroNet::trainLayers(Matrix &delta, Matrix &input, Matrix& out)
+void NeuroNet::trainLayers(my_matrix &delta, my_matrix &input, my_matrix &out)
 {
-    mFirstLayer = Matrix(mFirstLayer - input.transpose()* alpha(input) * delta * mSecondLayer.transpose());
-    mSecondLayer = Matrix(mSecondLayer - out.transpose()* alpha(out) * delta);
+    mFirstLayer = my_matrix( mFirstLayer - input.transpose() * alpha(input) * delta * mSecondLayer.transpose());
+    mSecondLayer = my_matrix( mSecondLayer - out.transpose()* alpha(out) * delta);
 
-    int cols = mSecondLayer.getCol();
-    int rows = mSecondLayer.getRow();
 
     mFirstLayer.normalize();
     mSecondLayer.normalize();
 }
 
-qreal NeuroNet::alpha(Matrix &vector)
+qreal NeuroNet::alpha(my_matrix &vector)
 {
     if(mAlpha != 0)
     {

@@ -5,6 +5,7 @@
 #include "Main_Window.h"
 #include "logic/Neuro_net.h"
 #include "logic/Image_proc.h"
+//#include "logic/matrix.h"
 
 class MainWindow;
 class NeuroNet;
@@ -31,7 +32,7 @@ private:
     MainWindow      mMainWindow;
     NeuroNet        mNeuroNet;
     ImageProc       mImageProc;
-    Matrix          mMatrix;
+    my_matrix       mMatrix;
 
 signals:
     

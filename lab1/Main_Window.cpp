@@ -32,7 +32,7 @@ QPixmap *MainWindow::loadPixmap()
 void MainWindow::ShowResult(QImage image)
 {
 
-    ui->LoadedImage->setPixmap(QPixmap::fromImage(image));
+    ui->CalculatedImage->setPixmap(QPixmap::fromImage(image));
 }
 
 void MainWindow::on_actionQuit_triggered()

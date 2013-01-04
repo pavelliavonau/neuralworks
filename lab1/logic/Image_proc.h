@@ -5,15 +5,14 @@
 #include "logic/matrix.h"
 
 class NeuroApp;
-class Matrix;
 
 class ImageProc
 {
 public:
     ImageProc();
 
-    Matrix GetTeachingMatrixFromPicture(QPixmap& pixmap, int n, int m);
-    QImage GetImageForMatrix(Matrix& mat, int n, int m);
+    my_matrix GetTeachingMatrixFromPicture(QPixmap& pixmap, int n, int m);
+    QImage GetImageForMatrix(my_matrix& mat, int n, int m);
 
 private:
 
