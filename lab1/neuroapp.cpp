@@ -1,15 +1,16 @@
 #include "neuroapp.h"
 #include <QPixmap>
 
-volatile const int NeuroApp::N = 4;
-volatile const int NeuroApp::M = 4;
-volatile const int NeuroApp::P = 60;
-volatile const double NeuroApp::ALPHA = 0.005;
+volatile const int NeuroApp::COLOR_DEPTH = 3;
+volatile const int NeuroApp::N = 5;
+volatile const int NeuroApp::M = 5;
+volatile const int NeuroApp::P = 50;
+volatile const double NeuroApp::ALPHA = 0.001;
 
 
 NeuroApp::NeuroApp() :
     mMainWindow( this )
-  , mNeuroNet( M * N * 4, P, ALPHA )
+  , mNeuroNet( M * N * COLOR_DEPTH, P, ALPHA )
   , mMatrix()
 {
     mMainWindow.show();
@@ -29,7 +30,7 @@ void NeuroApp::LoadImage()
 
 void NeuroApp::TeachNeuroNet()
 {
-    mNeuroNet.train(mMatrix, 10 , 1000);
+    mNeuroNet.train(mMatrix, 15 , 500);
     mNeuroNet.zipPicture(mMatrix);
 }
 

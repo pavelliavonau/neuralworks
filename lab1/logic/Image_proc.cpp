@@ -13,7 +13,7 @@ my_matrix ImageProc::GetTeachingMatrixFromPicture(QPixmap &pixmap, int n, int m)
     mWidth = pixmap.width();
     mHeight = pixmap.height();
 
-    int cols = n * m * (pixmap.depth() / 8);
+    int cols = n * m * 3/*(pixmap.depth() / 8 )*/;
     int rows = (pixmap.width() / n) * ( pixmap.height() / m );
 
     stream << "cols" << cols << std::endl;
@@ -51,10 +51,10 @@ my_matrix ImageProc::GetTeachingMatrixFromPicture(QPixmap &pixmap, int n, int m)
 //                       << " " << "col_index" << col_index;// << std::endl;
                 ++col_index;
 
-                matrix.set( row_index, col_index, normalizeColor( qAlpha( rgb ) ) );
-//                qDebug() << "row_index" << row_index
-//                       << " " << "col_index" << col_index;// << std::endl;
-                ++col_index;
+//                matrix.set( row_index, col_index, normalizeColor( qAlpha( rgb ) ) );
+////                qDebug() << "row_index" << row_index
+////                       << " " << "col_index" << col_index;// << std::endl;
+//                ++col_index;
                 //qDebug() << "x = " << dx + x;
             }
         }
@@ -98,10 +98,10 @@ QImage ImageProc::GetImageForMatrix(my_matrix &mat, int n, int m)
                 int blue = restoreColor(mat.get(row_index, col_index));
                 ++col_index;
 
-                int alpha = restoreColor(mat.get(row_index, col_index));
+                int alpha = restoreColor(/*mat.get(row_index, col_index)*/0);
 //                qDebug() << "row_index" << row_index
 //                       << " " << "col_index" << col_index;// << std::endl;
-                ++col_index;
+                //++col_index;
 
                 image.setPixel( x, y, qRgba( red, green, blue, alpha ) );
             }

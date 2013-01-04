@@ -126,7 +126,7 @@ Matrix<T>  Matrix<T>::operator*(const Matrix<T>& other) const
                 {
                     pthis.second = k;
                     pother.first = k;
-                    el+= (*this)[pthis] * other[pother];
+                    el+= matr[i][k]/*(*this)[pthis]*/ * other[pother];
                 }
                 pnew.first = i;
                 pnew.second = j;
@@ -167,15 +167,15 @@ Matrix<T> Matrix<T>::operator-(const Matrix<T> &other) const
 template <typename T>
 T& Matrix<T>::operator[](QPair<int,int>& p)
 {
-    QVector<T>& v = matr[p.first];
-    return v[p.second];
+    //QVector<T>& v = matr[p.first];
+    return matr[p.first][p.second];
 }
 
 template <typename T>
 const T &Matrix<T>::operator [](const QPair<int, int>& p) const
 {
-    const QVector<T>& v = matr[p.first];
-    return v[p.second];
+    //const QVector<T>& v = matr[p.first];
+    return matr[p.first][p.second];
 }
 
 template <typename T>
@@ -192,10 +192,11 @@ int Matrix<T>::getCol() const
 
 template <typename T>
 void Matrix<T>::set(const int row, const int col, const T val){
-    QPair<int,int> p;
-    p.first = row;
-    p.second = col;
-    this->operator [](p) = val;
+//    QPair<int,int> p;
+//    p.first = row;
+//    p.second = col;
+//    this->operator [](p) = val;
+    matr[row][col] = val;
 }
 
 template <typename T>
@@ -207,7 +208,7 @@ Matrix<T>  Matrix<T>::operator*(const T val)
         for(int j = 0; j < col; j++){
             p.first = i;
             p.second = j;
-            mnew.operator [](p) = this->operator [](p)*val;
+            mnew[p] = matr[i][j] * val;
         }
     }
     return mnew;
@@ -216,8 +217,8 @@ Matrix<T>  Matrix<T>::operator*(const T val)
 template <typename T>
 T Matrix<T>::get(int row,int col) const
 {
-    const QVector<T>& v = matr[row];
-    return v[col];
+    //const QVector<T>& v = matr[row];
+    return matr[row][col];
 }
 
 template <typename T>

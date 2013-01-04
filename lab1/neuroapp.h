@@ -18,7 +18,7 @@ public:
     explicit NeuroApp();
     virtual ~NeuroApp();
     
-
+    static volatile const int COLOR_DEPTH;
     static volatile const int N;
     static volatile const int M;
     static volatile const int P;

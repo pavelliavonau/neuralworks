@@ -35,8 +35,9 @@ bool NeuroNet::train(my_matrix &trainData, int maxIteration, int maxError)
 
             accomulateError(error, delta);
             trainLayers(delta, inData, outData);
+            //qDebug() << "it= " << it << " error = " << error;
         }
-        qDebug() << "error = " << error;
+        qDebug() << "it= " << it << " error = " << error;
         it++;
     }
 
@@ -79,7 +80,7 @@ void NeuroNet::accomulateError(double &error, my_matrix &vector)
     }
 }
 
-void NeuroNet::trainLayers(my_matrix &delta, my_matrix &input, my_matrix &out)
+void NeuroNet::trainLayers( my_matrix &delta, my_matrix &input, my_matrix &out )
 {
     mFirstLayer = my_matrix( mFirstLayer - input.transpose() * alpha(input) * delta * mSecondLayer.transpose());
     mSecondLayer = my_matrix( mSecondLayer - out.transpose()* alpha(out) * delta);
