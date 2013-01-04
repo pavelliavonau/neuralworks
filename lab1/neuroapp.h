@@ -1,11 +1,9 @@
 #ifndef NEUROAPP_H
 #define NEUROAPP_H
 
-//#include <QApplication>
 #include "Main_Window.h"
 #include "logic/Neuro_net.h"
 #include "logic/Image_proc.h"
-//#include "logic/matrix.h"
 
 class MainWindow;
 class NeuroNet;
@@ -28,15 +26,19 @@ public:
     void TeachNeuroNet();
     void ShowResult();
 
+protected:
+    bool event(QEvent *);
+
 private:
     MainWindow      mMainWindow;
     NeuroNet        mNeuroNet;
     ImageProc       mImageProc;
     my_matrix       mMatrix;
-
-signals:
     
 public slots:
+
+signals:
+    void sendToLog(QString);
     
 };
 

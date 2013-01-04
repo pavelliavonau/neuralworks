@@ -31,7 +31,6 @@ private:
 
     int mWidth;
     int mHeight;
-    //NeuroApp* mNeuroApp;
 };
 
 #endif // IMAGE_PROC_H

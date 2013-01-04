@@ -54,3 +54,9 @@ void MainWindow::on_actionDraw_result_triggered()
 {
     mNeuroApp->ShowResult();
 }
+
+void MainWindow::writeToLog(QString text)
+{
+    ui->logWidget->appendPlainText(text);
+    repaint();
+}

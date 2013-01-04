@@ -17,12 +17,14 @@ SOURCES += main.cpp\
         Main_Window.cpp \
     neuroapp.cpp \
     logic/Image_proc.cpp \
-    logic/Neuro_net.cpp
+    logic/Neuro_net.cpp \
+    events/logtextevent.cpp
 
 HEADERS  += Main_Window.h \
     logic/matrix.h \
     neuroapp.h \
     logic/Image_proc.h \
-    logic/Neuro_net.h
+    logic/Neuro_net.h \
+    events/logtextevent.h
 
 FORMS    += Main_Window.ui

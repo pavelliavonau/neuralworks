@@ -30,6 +30,9 @@ private slots:
 
     void on_actionDraw_result_triggered();
 
+public slots:
+    void writeToLog(QString);
+
 private:
     Ui::MainWindow *ui;
     QPixmap         mLoadedPicture;

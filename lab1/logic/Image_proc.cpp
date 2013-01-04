@@ -1,5 +1,5 @@
 #include "Image_proc.h"
-#include <fstream>
+//#include <fstream>
 #include <QDebug>
 
 ImageProc::ImageProc()
@@ -8,16 +8,12 @@ ImageProc::ImageProc()
 
 my_matrix ImageProc::GetTeachingMatrixFromPicture(QPixmap &pixmap, int n, int m)
 {
-    std::ofstream stream("input");
 
     mWidth = pixmap.width();
     mHeight = pixmap.height();
 
-    int cols = n * m * 3/*(pixmap.depth() / 8 )*/;
+    int cols = n * m * 3;
     int rows = (pixmap.width() / n) * ( pixmap.height() / m );
-
-    stream << "cols" << cols << std::endl;
-    stream << "rows" << rows << std::endl;
 
     my_matrix matrix( rows, cols );
 
@@ -70,14 +66,14 @@ my_matrix ImageProc::GetTeachingMatrixFromPicture(QPixmap &pixmap, int n, int m)
         }
 //        qDebug() << row_index << "dx = " << dx;
     }
-    stream.close();
+//    stream.close();
     return matrix;
 }
 
 QImage ImageProc::GetImageForMatrix(my_matrix &mat, int n, int m)
 {
     QImage image( mWidth, mHeight, QImage::Format_RGB32 );
-    std::ofstream stream("output");
+//    std::ofstream stream("output");
     int row_index = 0;
     int col_index = 0;
 

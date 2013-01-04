@@ -2,10 +2,13 @@
 #include "logic/matrix.h"
 #include <fstream>
 #include <QDebug>
+#include "events/logtextevent.h"
+#include <QApplication>
 
-NeuroNet::NeuroNet(int neuronsOnFirstLayer, int neuronsOnSecondLayer, double alpha):    
+NeuroNet::NeuroNet(int neuronsOnFirstLayer, int neuronsOnSecondLayer, double alpha, QObject* receiver):
     mFirstLayer(neuronsOnFirstLayer, neuronsOnSecondLayer)
   , mAlpha(alpha)
+  , m_receiver(receiver)
 {  
     mFirstLayer.randomInitialize();
 
@@ -39,6 +42,7 @@ bool NeuroNet::train(my_matrix &trainData, int maxIteration, int maxError)
             accomulateError(error, delta);
             trainLayers(delta, inData, outData);            
         }
+        sendLogText("it= " + QString::number(it) + " error = " + QString::number(error) + "\n");
         qDebug() << "it= " << it << " error = " << error;
         it++;
     }
@@ -107,4 +111,12 @@ qreal NeuroNet::alpha(my_matrix &vector)
     }
 
     return 1/result;
+}
+
+void NeuroNet::sendLogText(QString text)
+{
+    LogTextEvent log_event;
+    log_event.setText(text);
+    //QMouseEvent event(QEvent::MouseButtonPress, pos, 0, 0, 0);
+    QApplication::sendEvent(m_receiver, &log_event);
 }
