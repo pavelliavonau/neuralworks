@@ -15,7 +15,6 @@ CONFIG += debug
 
 SOURCES += main.cpp\
         Main_Window.cpp \
-    logic/matrix.cpp \
     neuroapp.cpp \
     logic/Image_proc.cpp \
     logic/Neuro_net.cpp

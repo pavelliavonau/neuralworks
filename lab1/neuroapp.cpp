@@ -2,10 +2,10 @@
 #include <QPixmap>
 
 volatile const int NeuroApp::COLOR_DEPTH = 3;
-volatile const int NeuroApp::N = 5;
-volatile const int NeuroApp::M = 5;
-volatile const int NeuroApp::P = 50;
-volatile const double NeuroApp::ALPHA = 0.001;
+volatile const int NeuroApp::N = 4;
+volatile const int NeuroApp::M = 4;
+volatile const int NeuroApp::P = 40;
+volatile const double NeuroApp::ALPHA = 0.003;
 
 
 NeuroApp::NeuroApp() :
@@ -30,7 +30,7 @@ void NeuroApp::LoadImage()
 
 void NeuroApp::TeachNeuroNet()
 {
-    mNeuroNet.train(mMatrix, 15 , 500);
+    mNeuroNet.train(mMatrix, 50 , 100);
     mNeuroNet.zipPicture(mMatrix);
 }
 

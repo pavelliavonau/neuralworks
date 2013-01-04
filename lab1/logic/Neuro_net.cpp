@@ -3,9 +3,9 @@
 #include <fstream>
 #include <QDebug>
 
-NeuroNet::NeuroNet(int neuronsOnFirstLayer, int neuronsOnSecondLayer, double alpha):
-    mAlpha(alpha)
-  , mFirstLayer(neuronsOnFirstLayer, neuronsOnSecondLayer)
+NeuroNet::NeuroNet(int neuronsOnFirstLayer, int neuronsOnSecondLayer, double alpha):    
+    mFirstLayer(neuronsOnFirstLayer, neuronsOnSecondLayer)
+  , mAlpha(alpha)
 {  
     mFirstLayer.randomInitialize();
 
@@ -19,28 +19,30 @@ NeuroNet::NeuroNet(int neuronsOnFirstLayer, int neuronsOnSecondLayer, double alp
 
 bool NeuroNet::train(my_matrix &trainData, int maxIteration, int maxError)
 {
-    double error = maxError + 1, it = 0;
+    double error = maxError + 1;
+    int it = 0;
+
+    int train_data_row_count = trainData.getRow();
 
     while( error > maxError && it < maxIteration )
     {
         error = 0;
 
-        for( int i = 0; i < trainData.getRow(); i++ )
+        for( int i = 0; i < train_data_row_count; i++ )
         {
-            my_matrix inData = trainData.getVector(i),
+            my_matrix inData = trainData.getVector(i);
 
-                   outData = inData * mFirstLayer,
-                   restoredData = outData * mSecondLayer,
-                   delta = restoredData - trainData.getVector(i);
+            my_matrix outData = inData * mFirstLayer;
+            my_matrix restoredData = outData * mSecondLayer;
+            my_matrix delta = restoredData - trainData.getVector(i);
 
             accomulateError(error, delta);
-            trainLayers(delta, inData, outData);
-            //qDebug() << "it= " << it << " error = " << error;
+            trainLayers(delta, inData, outData);            
         }
         qDebug() << "it= " << it << " error = " << error;
         it++;
     }
-
+    qDebug() << "finished!";
     return true;
 }
 
@@ -76,14 +78,14 @@ void NeuroNet::accomulateError(double &error, my_matrix &vector)
 {
     for( int j = 0; j < vector.getCol(); j++ )
     {
-        error += vector.get(0, j) * vector.get(0, j);
+        error += std::pow(vector.get(0, j), 2);
     }
 }
 
 void NeuroNet::trainLayers( my_matrix &delta, my_matrix &input, my_matrix &out )
 {
-    mFirstLayer = my_matrix( mFirstLayer - input.transpose() * alpha(input) * delta * mSecondLayer.transpose());
-    mSecondLayer = my_matrix( mSecondLayer - out.transpose()* alpha(out) * delta);
+    mFirstLayer -= input.transpose() * alpha(input) * delta * mSecondLayer.transpose();
+    mSecondLayer -= out.transpose() * alpha(out) * delta;
 
 
     mFirstLayer.normalize();

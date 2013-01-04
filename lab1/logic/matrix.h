@@ -1,35 +1,42 @@
 #ifndef MATRIX_H
 #define MATRIX_H
-#include <QVector>
-#include <QPair>
+
 #include <iostream>
-#include "stdlib.h"
 #include <cmath>
 #include <QTime>
 
-#define matrix_data_t QVector< QVector<T> >
+#define matrix_data_t T*
+#define const_p_matrix_data_t const T*
 
 template <class T> class Matrix
 {
-    int row;
-    int col;
+    int m_row;
+    int m_col;
 
-    matrix_data_t matr;
+    matrix_data_t m_matr;
     T getAvgForVector( int num );
 
 public:
     Matrix( const int row = 0,const int col = 0 );
-
-    Matrix( const Matrix<T> &copy );
+    ~Matrix();
+    Matrix( const Matrix<T> &copy );    
 
     Matrix<T>& operator=( const Matrix<T>& );
     Matrix<T> operator*( const Matrix<T>& ) const;
     Matrix<T> operator-( const Matrix<T>& ) const;
+    Matrix<T>& operator-=(const Matrix<T>& );
     Matrix<T> operator*( const T );
-    void set( const int, const int, const T );
-    T get(int,int) const;
-    int getCol() const;
-    int getRow() const;
+    void set(const int&, const int&, const T & );
+    inline const T& get(const int&, const int&) const;
+    inline T& get(const int&, const int&);
+    const int& getCol() const
+    {
+        return m_col;
+    }
+    const int& getRow() const
+    {
+        return m_row;
+    }
     QString toString() const;
     void randomInitialize();
     Matrix<T> transpose();
@@ -42,37 +49,42 @@ public:
     template<class T2>
     friend std::istream& operator>>( std::istream& is, Matrix<T2>& obj );
 
-    T& operator[]( QPair< int, int >& );
-    const T& operator[]( const QPair< int, int >& ) const;
-    matrix_data_t getMatrix() const;
+    const_p_matrix_data_t getMatrix() const;
 };
 
-typedef Matrix<float> my_matrix;
-typedef QVector<float> my_vector;
+
+typedef double my_t;
+typedef Matrix<my_t> my_matrix;
+typedef QVector<my_t> my_vector;
 
 template <class T>
-Matrix<T>::Matrix(const int row,const int col) :
-    matr(QVector< QVector<T> >(row))
+Matrix<T>::Matrix(const int row, const int col)
 {
-    this->row = row;
-    this->col = col;
+    m_row = row;
+    m_col = col;
 
-    for( int i = 0; i < row; i++ ){
-        matr[i] = QVector<T>( col );
-    }
+    m_matr = new T [m_row * m_col];
+}
+
+template <class T>
+Matrix<T>::~Matrix()
+{
+    delete [] m_matr;
 }
 
 template <class T>
 Matrix<T>::Matrix(const Matrix<T> &copy) :
-    row(copy.getRow()),
-    col(copy.getCol()),
-    matr(matrix_data_t(row))
+    m_row( copy.getRow() ),
+    m_col( copy.getCol() )
 {
-    matrix_data_t copyMatrix = copy.getMatrix();
 
-    for( int i = 0; i < row; i++ ){
-        QVector<T> temp =  QVector<T>(copyMatrix.at(i));
-        matr[i] = temp;
+    m_matr = new T [m_row * m_col];
+
+    const_p_matrix_data_t copyMatrix = copy.getMatrix();
+
+    for( int i = 0; i < m_row * m_col; i++ )
+    {
+        m_matr[i] = copyMatrix[i];
     }
 }
 
@@ -81,25 +93,17 @@ Matrix<T>& Matrix<T>::operator=(const Matrix<T> &other){
 
     if( this != &other )
     {
-        col = other.getCol();
-        row = other.getRow();
-        // fit row size
-        matr.resize( row );
+        delete [] m_matr;
 
-        for( int rowi = 0; rowi < row; ++rowi )
+        m_col = other.getCol();
+        m_row = other.getRow();
+        m_matr = new T [m_row * m_col];
+
+        const_p_matrix_data_t otherMatrix = other.getMatrix();
+
+        for( int i = 0; i < m_row * m_col; ++i )
         {
-            my_vector& v = matr[ rowi ];
-            v = my_vector( col );
-        }
-        QPair<int,int> p;
-        for(int i = 0; i < row; i++){
-            for(int j = 0; j < col; j++)
-            {
-                p.first = i;
-                p.second = j;
-                my_vector& v = matr[ i ];
-                v[j] = other[p];
-            }
+            m_matr[i] = otherMatrix[i];
         }
     }
     return *this;
@@ -108,29 +112,21 @@ Matrix<T>& Matrix<T>::operator=(const Matrix<T> &other){
 template <typename T>
 Matrix<T>  Matrix<T>::operator*(const Matrix<T>& other) const
 {
-    if( this->col == other.getRow() )
+    if( this->m_col == other.getRow() )
     {
-        Matrix result_matrix( row, other.getCol() );
+        int res_col = other.getCol();
+        Matrix result_matrix( m_row, res_col );
 
-        QPair< int, int > pnew,
-                          pthis,
-                          pother;
-        T el = 0;
-        for( int i = 0; i < row; ++i )
+        T el = 0;        
+        for( int i = 0; i < m_row; ++i )
         {
-            for( int j = 0; j < result_matrix.getCol(); ++j )
+            for( int j = 0; j < res_col; ++j )
             {
-                pthis.first = i;
-                pother.second = j;
-                for( int k = 0; k < col; ++k)
+                for( int k = 0; k < m_col; ++k)
                 {
-                    pthis.second = k;
-                    pother.first = k;
-                    el+= matr[i][k]/*(*this)[pthis]*/ * other[pother];
+                    el += m_matr[i * m_col + k] * other.get(k, j);
                 }
-                pnew.first = i;
-                pnew.second = j;
-                result_matrix[pnew] = el;
+                result_matrix.get(i, j) = el;
                 el = 0;
             }
         }
@@ -146,16 +142,16 @@ Matrix<T>  Matrix<T>::operator*(const Matrix<T>& other) const
 template <typename T>
 Matrix<T> Matrix<T>::operator-(const Matrix<T> &other) const
 {
-    if( other.getCol() != col || other.getRow() != row )
+    if( other.getCol() != m_col || other.getRow() != m_row )
     {
         return *this;
     }
 
-    Matrix<T> newMatrix(row, col);
+    Matrix<T> newMatrix(m_row, m_col);
 
-    for( int i = 0; i < row; i++ )
+    for( int i = 0; i < m_row; i++ )
     {
-        for( int j = 0; j < col; j++ )
+        for( int j = 0; j < m_col; j++ )
         {
             newMatrix.set(i, j, get(i, j) - other.get(i, j));
         }
@@ -165,66 +161,61 @@ Matrix<T> Matrix<T>::operator-(const Matrix<T> &other) const
 }
 
 template <typename T>
-T& Matrix<T>::operator[](QPair<int,int>& p)
+Matrix<T>& Matrix<T>::operator-=(const Matrix<T>& other )
 {
-    //QVector<T>& v = matr[p.first];
-    return matr[p.first][p.second];
+    if( other.getCol() != m_col || other.getRow() != m_row )
+    {
+        return *this;
+    }
+
+    for( int i = 0; i < m_row; i++ )
+    {
+        for( int j = 0; j < m_col; j++ )
+        {
+            this->set(i, j, get(i, j) - other.get(i, j));
+        }
+    }
+
+    return *this;
 }
 
 template <typename T>
-const T &Matrix<T>::operator [](const QPair<int, int>& p) const
-{
-    //const QVector<T>& v = matr[p.first];
-    return matr[p.first][p.second];
-}
+void Matrix<T>::set(const int &row, const int &col, const T& val){
 
-template <typename T>
-int Matrix<T>::getRow() const
-{
-    return row;
-}
-
-template <typename T>
-int Matrix<T>::getCol() const
-{
-    return col;
-}
-
-template <typename T>
-void Matrix<T>::set(const int row, const int col, const T val){
-//    QPair<int,int> p;
-//    p.first = row;
-//    p.second = col;
-//    this->operator [](p) = val;
-    matr[row][col] = val;
+    m_matr[row * m_col + col] = val;
 }
 
 template <typename T>
 Matrix<T>  Matrix<T>::operator*(const T val)
 {
-    Matrix mnew( row, col );
-    QPair< int, int > p;
-    for(int i = 0; i < row; i++){
-        for(int j = 0; j < col; j++){
-            p.first = i;
-            p.second = j;
-            mnew[p] = matr[i][j] * val;
+    Matrix mnew( m_row, m_col );
+
+    for( int i = 0; i < m_row; ++i)
+    {
+        for( int j = 0; j < m_col; ++j)
+        {
+            mnew.get(i, j) = m_matr[i * m_col + j] * val;
         }
     }
     return mnew;
 }
 
 template <typename T>
-T Matrix<T>::get(int row,int col) const
+inline const T &Matrix<T>::get(const int &row, const int &col) const
 {
-    //const QVector<T>& v = matr[row];
-    return matr[row][col];
+    return m_matr[m_col * row + col];
 }
 
 template <typename T>
-QVector<QVector<T> > Matrix<T>::getMatrix() const
+inline T& Matrix<T>::get(const int& row, const int& col)
 {
-    return matr;
+    return m_matr[m_col * row + col];
+}
+
+template <typename T>
+const T *Matrix<T>::getMatrix() const
+{
+    return m_matr;
 }
 
 template <typename T>
@@ -232,12 +223,12 @@ QString Matrix<T>::toString() const
 {
     QString matrixString;
     matrixString.append("{ ");
-    for( int i = 0; i < row; i++ )
+    for( int i = 0; i < m_row; i++ )
     {
         matrixString.append("{ ");
-        for( int j = 0; j < col; j++ )
+        for( int j = 0; j < m_col; j++ )
         {
-            matrixString.append(((j!=0)?",":"") +  QString::number(matr[i][j]));
+            matrixString.append(( (j != 0)?",":"") +  QString::number( m_matr[ i * m_col + j] ));
         }
         matrixString.append("}\n");
     }
@@ -250,9 +241,9 @@ void Matrix<T>::randomInitialize()
 {
     qsrand(QTime::currentTime().msec());
 
-    for( int i = 0; i < row; i++ )
+    for( int i = 0; i < m_row; i++ )
     {
-        for( int j = 0; j < col; j++ )
+        for( int j = 0; j < m_col; j++ )
         {
             long int rand_value = rand() % 2001;
             set(i,j, T(rand_value / 1000. - 1));
@@ -263,13 +254,13 @@ void Matrix<T>::randomInitialize()
 template <typename T>
 Matrix<T> Matrix<T>::transpose()
 {
-    Matrix newMatrix(col, row);
+    Matrix newMatrix( m_col, m_row);
 
-    for( int i = 0; i < row; i++ )
+    for( int i = 0; i < m_row; i++ )
     {
-        for( int j = 0; j < col; j++ )
+        for( int j = 0; j < m_col; j++ )
         {
-            newMatrix.set(j, i, matr[i][j]);
+            newMatrix.set( j, i, m_matr[i * m_col + j] );
         }
     }
 
@@ -279,11 +270,11 @@ Matrix<T> Matrix<T>::transpose()
 template <typename T>
 Matrix<T> Matrix<T>::getVector(int num)
 {
-    Matrix vector(1, col);
+    Matrix vector(1, m_col);
 
-    for( int j = 0; j < col; j++ )
+    for( int j = 0; j < m_col; j++ )
     {
-        vector.set(0, j, matr[num][j]);
+        vector.set(0, j, m_matr[num * m_col + j]);
     }
 
     return vector;
@@ -292,13 +283,13 @@ Matrix<T> Matrix<T>::getVector(int num)
 template <typename T>
 void Matrix<T>::normalize()
 {
-    for( int j = 0; j < col; j++ )
+    for( int j = 0; j < m_col; j++ )
     {
         T avg = getAvgForVector(j);
 
-        for( int i = 0; i < row; i++ )
+        for( int i = 0; i < m_row; i++ )
         {
-            set(i, j, matr[i][j] / avg);
+            set(i, j, m_matr[i * m_col + j] / avg);
         }
     }
 }
@@ -308,27 +299,24 @@ T Matrix<T>::getAvgForVector(int num)
 {
     T sum = 0;
 
-//    T max = -666;
-    for( int i = 0; i < row; i++ )
+    for( int i = 0; i < m_row; i++ )
     {
-//        if( max < matr[i][num] )
-//            max = matr[i][num];
-        sum += matr[i][num] * matr[i][num];
+        sum += m_matr[i * m_col + num] * m_matr[i * m_col + num];
     }
 
-    return /*max;*it;*/sqrt( sum );
+    return sqrt( sum );
 }
 
 template <typename T>
 std::ostream & operator <<(std::ostream &os, const Matrix<T>& obj)
 {
-    os << obj.row << std::endl;
-    os << obj.col << std::endl;
-    for( int i = 0; i < obj.row; i++ )
+    os << obj.m_row << std::endl;
+    os << obj.m_col << std::endl;
+    for( int i = 0; i < obj.m_row; i++ )
     {
-        for( int j = 0; j < obj.col; j++ )
+        for( int j = 0; j < obj.m_col; j++ )
         {
-            os << obj.matr[i][j] << " ";
+            os << obj.m_matr[i * obj.m_col + j] << " ";
         }
     }
     return os;
@@ -344,17 +332,13 @@ std::istream & operator >>(std::istream &is, Matrix<T>& obj)
 
     obj = Matrix<T>( row, col );
 
-    for( int i = 0; i < obj.row; i++ ){
-        obj.matr[i] = QVector<T>();
-    }
-
-    for( int i = 0; i < obj.row; i++ )
+    for( int i = 0; i < obj.m_row; i++ )
     {
-        for( int j = 0; j < obj.col; j++ )
+        for( int j = 0; j < obj.m_col; j++ )
         {
             T v;
             is >> v;
-            obj.matr[i].push_back(v);
+            obj.m_matr[i * obj.m_col + j] = v;
         }
     }
 

@@ -20,7 +20,13 @@ private:
     { return 2 * static_cast<double>(value) / 256 - 1; }
 
     inline int restoreColor(qreal value)
-    { return (256 * (value + 1))/2; }
+    {
+//        if( value > 1.0 )
+//            value = 1.0;
+//        if( value < -1.0 )
+//            value = -1.0;
+        return (256 * (value + 1))/2;
+    }
 
 
     int mWidth;
